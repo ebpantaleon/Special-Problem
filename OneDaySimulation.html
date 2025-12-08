@@ -1,0 +1,763 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- saved from url=(0175)https://matlab-1b.mathworks.com/static/UlIPFn7h/ef20027c-9621-4ad6-8607-a4d4211ec678/OneDaySimulation.html?snc=D8O9FK&mre=https%3A%2F%2Fmatlab-1b.mathworks.com%2F&websocket=on -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      -->
+<title>OneDaySimulation</title>
+<meta name="generator" content="MATLAB 25.2">
+<link rel="schema.DC" href="http://purl.org/dc/elements/1.1/">
+<meta name="DC.date" content="2025-12-07">
+<meta name="DC.source" content="OneDaySimulation.m">
+<style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style>
+</head>
+<body>
+<div class="content">
+<pre class="codeinput">clc; clear; close <span class="string">all</span>;
+
+startTime = datetime(2025,12,11,0,0,0);
+endTime   = datetime(2025,12,12,0,0,0);
+timeSteps = startTime:minutes(30):endTime;
+iterations = numel(timeSteps);
+
+fis = mamfis(<span class="string">'Name'</span>, <span class="string">'Special Problem'</span>);
+
+fis = addInput(fis, [0 60], <span class="string">'Name'</span>, <span class="string">'Queue'</span>);
+fis = addMF(fis, <span class="string">'Queue'</span>, <span class="string">'trimf'</span>, [0 0 15], <span class="string">'Name'</span>, <span class="string">'Short'</span>);
+fis = addMF(fis, <span class="string">'Queue'</span>, <span class="string">'trimf'</span>, [10 30 50], <span class="string">'Name'</span>, <span class="string">'Medium'</span>);
+fis = addMF(fis, <span class="string">'Queue'</span>, <span class="string">'trimf'</span>, [40 60 60], <span class="string">'Name'</span>, <span class="string">'Long'</span>);
+
+fis = addInput(fis, [0 40], <span class="string">'Name'</span>, <span class="string">'Arrival'</span>);
+fis = addMF(fis, <span class="string">'Arrival'</span>, <span class="string">'trimf'</span>, [0 0 10], <span class="string">'Name'</span>, <span class="string">'Low'</span>);
+fis = addMF(fis, <span class="string">'Arrival'</span>, <span class="string">'trimf'</span>, [5 20 35], <span class="string">'Name'</span>, <span class="string">'Medium'</span>);
+fis = addMF(fis, <span class="string">'Arrival'</span>, <span class="string">'trimf'</span>, [30 40 40], <span class="string">'Name'</span>, <span class="string">'High'</span>);
+
+fis = addInput(fis, [0 90], <span class="string">'Name'</span>, <span class="string">'Waiting'</span>);
+fis = addMF(fis, <span class="string">'Waiting'</span>, <span class="string">'trimf'</span>, [0 0 25], <span class="string">'Name'</span>, <span class="string">'Short'</span>);
+fis = addMF(fis, <span class="string">'Waiting'</span>, <span class="string">'trimf'</span>, [15 45 75], <span class="string">'Name'</span>, <span class="string">'Moderate'</span>);
+fis = addMF(fis, <span class="string">'Waiting'</span>, <span class="string">'trimf'</span>, [60 90 90], <span class="string">'Name'</span>, <span class="string">'Long'</span>);
+
+fis = addOutput(fis, [0 120], <span class="string">'Name'</span>, <span class="string">'TotalGreen'</span>);
+fis = addMF(fis, <span class="string">'TotalGreen'</span>, <span class="string">'trapmf'</span>, [10 10 30 40], <span class="string">'Name'</span>, <span class="string">'Short'</span>);
+fis = addMF(fis, <span class="string">'TotalGreen'</span>, <span class="string">'trapmf'</span>, [30 40 70 80], <span class="string">'Name'</span>, <span class="string">'Medium'</span>);
+fis = addMF(fis, <span class="string">'TotalGreen'</span>, <span class="string">'trapmf'</span>, [60 80 120 120], <span class="string">'Name'</span>, <span class="string">'Long'</span>);
+
+fis.DefuzzificationMethod = <span class="string">'centroid'</span>;
+
+fuzzyrules = [
+    1 1 1 1; 1 1 2 1; 1 1 3 2;
+    1 2 1 1; 1 2 2 2; 1 2 3 2;
+    1 3 1 2; 1 3 2 2; 1 3 3 3;
+    2 1 1 2; 2 1 2 2; 2 1 3 3;
+    2 2 1 2; 2 2 2 2; 2 2 3 3;
+    2 3 1 2; 2 3 2 3; 2 3 3 3;
+    3 1 1 2; 3 1 2 2; 3 1 3 3;
+    3 2 1 2; 3 2 2 3; 3 2 3 3;
+    3 3 1 3; 3 3 2 3; 3 3 3 3
+];
+
+<span class="keyword">for</span> i = 1:size(fuzzyrules, 1)
+    fis = addRule(fis, [fuzzyrules(i,:) 1 1]);
+<span class="keyword">end</span>
+
+leftshare = 0.2;
+queue_range = [0 60];
+waiting_range = [0 90];
+results = table(<span class="string">'Size'</span>,[0 10],<span class="keyword">...</span>
+    <span class="string">'VariableTypes'</span>,{<span class="string">'datetime'</span>,<span class="string">'double'</span>,<span class="string">'double'</span>,<span class="string">'double'</span>,<span class="string">'double'</span>,<span class="string">'double'</span>,<span class="string">'double'</span>,<span class="string">'double'</span>,<span class="string">'categorical'</span>,<span class="string">'categorical'</span>},<span class="keyword">...</span>
+    <span class="string">'VariableNames'</span>,{<span class="string">'Time'</span>,<span class="string">'Intersection'</span>,<span class="string">'Queue'</span>,<span class="string">'Arrival'</span>,<span class="string">'Waiting'</span>,<span class="string">'TotalGreen'</span>,<span class="string">'Through'</span>,<span class="string">'LeftTurn'</span>,<span class="string">'First'</span>,<span class="string">'Second'</span>});
+
+<span class="comment">% rng('shuffle');</span>
+
+<span class="keyword">for</span> t = 1:iterations
+    currentTime = timeSteps(t);
+    tdec = hour(currentTime) + minute(currentTime)/60;
+
+    <span class="keyword">if</span> (hour(currentTime) &gt;= 0 &amp;&amp; hour(currentTime) &lt; 5) || (hour(currentTime) &gt;= 22 &amp;&amp; hour(currentTime) &lt;= 23)
+        lambda = 3;
+        QL_NS1 = poissrnd(1);
+        QL_EW1 = poissrnd(1);
+        WT_NS1 = round(rand*2);
+        WT_EW1 = round(rand*2);
+
+    <span class="keyword">elseif</span> (tdec &gt;= 7 &amp;&amp; tdec &lt; 9) || (tdec &gt;= 17 &amp;&amp; tdec &lt; 21)
+        lambda = 50;
+        QL_NS1 = max(0, round(normrnd(60,20)));
+        QL_EW1 = max(0, round(normrnd(60,20)));
+        WT_NS1 = randi([25 90]);
+        WT_EW1 = randi([25 90]);
+    <span class="keyword">else</span>
+        lambda = 15;
+        QL_NS1 = randi(queue_range);
+        QL_EW1 = randi(queue_range);
+        WT_NS1 = randi(waiting_range);
+        WT_EW1 = randi(waiting_range);
+    <span class="keyword">end</span>
+
+   AR_NS1 = poissrnd(lambda);
+   AR_EW1 = poissrnd(lambda);
+
+   AR_NS1 = max(min(AR_NS1,40),0);
+   AR_EW1 = max(min(AR_EW1,40),0);
+   QL_NS1 = max(min(QL_NS1,60),0);
+   QL_EW1 = max(min(QL_EW1,60),0);
+   WT_NS1 = max(min(WT_NS1,90),0);
+   WT_EW1 = max(min(WT_EW1,90),0);
+
+    <span class="keyword">if</span> QL_NS1 &gt;= QL_EW1
+        First = <span class="string">'NS'</span>;
+        Second = <span class="string">'EW'</span>;
+        QL_first = QL_NS1;
+        AR_first = AR_NS1;
+        WT_first = WT_NS1;
+        QL_second = QL_EW1;
+        AR_second = AR_EW1;
+        WT_second = WT_EW1;
+    <span class="keyword">else</span>
+        First = <span class="string">'EW'</span>;
+        Second = <span class="string">'NS'</span>;
+        QL_first = QL_EW1;
+        AR_first = AR_EW1;
+        WT_first = WT_EW1;
+        QL_second = QL_NS1;
+        AR_second = AR_NS1;
+        WT_second = WT_NS1;
+    <span class="keyword">end</span>
+
+    TG_first = round(evalfis(fis, [QL_first, AR_first, WT_first]));
+    TG_second = round(evalfis(fis, [QL_second, AR_second, WT_second]));
+    LT_first = max(round(TG_first * leftshare), 3);
+    LT_second = max(round(TG_second * leftshare), 3);
+    TH_first = TG_first;
+    TH_second = TG_second;
+
+    results = [results;
+        {currentTime, 1, QL_first, AR_first, WT_first, TG_first, TH_first, LT_first, First, Second};
+        {currentTime, 1, QL_second, AR_second, WT_second, TG_second, TH_second, LT_second, Second, First}];
+
+    served_factor = 0.5;
+    QL_NS2 = max(0, QL_NS1 - round(served_factor * TG_first*(strcmp(First,<span class="string">'NS'</span>) + 0*strcmp(Second,<span class="string">'NS'</span>))) <span class="keyword">...</span>
+                    - round(served_factor * TG_second*(strcmp(Second,<span class="string">'NS'</span>) + 0*strcmp(First,<span class="string">'NS'</span>))) + randi([-2 2]));
+    QL_EW2 = max(0, QL_EW1 - round(served_factor * TG_first*(strcmp(First,<span class="string">'EW'</span>) + 0*strcmp(Second,<span class="string">'EW'</span>))) <span class="keyword">...</span>
+                    - round(served_factor * TG_second*(strcmp(Second,<span class="string">'EW'</span>) + 0*strcmp(First,<span class="string">'EW'</span>))) + randi([-2 2]));
+
+    AR_NS2 = AR_NS1;
+    AR_EW2 = AR_EW1;
+    WT_NS2 = max(0, WT_NS1 - round(0.2*TG_first) + randi([-3 3]));
+    WT_EW2 = max(0, WT_EW1 - round(0.2*TG_second) + randi([-3 3]));
+
+    QL_NS2 = max(min(QL_NS2,160),0);
+    QL_EW2 = max(min(QL_EW2,160),0);
+    WT_NS2 = max(min(WT_NS2,90),0);
+    WT_EW2 = max(min(WT_EW2,90),0);
+
+    <span class="keyword">if</span> QL_NS2 &gt;= QL_EW2
+        First2 = <span class="string">'NS'</span>;
+        Second2 = <span class="string">'EW'</span>;
+        QL_first2 = QL_NS2;
+        AR_first2 = AR_NS2;
+        WT_first2 = WT_NS2;
+        QL_second2 = QL_EW2;
+        AR_second2 = AR_EW2;
+        WT_second2 = WT_EW2;
+    <span class="keyword">else</span>
+        First2 = <span class="string">'EW'</span>;
+        Second2 = <span class="string">'NS'</span>;
+        QL_first2 = QL_EW2;
+        AR_first2 = AR_EW2;
+        WT_first2 = WT_EW2;
+        QL_second2 = QL_NS2;
+        AR_second2 = AR_NS2;
+        WT_second2 = WT_NS2;
+    <span class="keyword">end</span>
+
+    TG_first2 = round(evalfis(fis, [QL_first2, AR_first2, WT_first2]));
+    TG_second2 = round(evalfis(fis, [QL_second2, AR_second2, WT_second2]));
+    LT_first2 = max(round(TG_first2 * leftshare), 3);
+    LT_second2 = max(round(TG_second2 * leftshare), 3);
+    TH_first2 = TG_first2;
+    TH_second2 = TG_second2;
+
+    results = [results;
+        {currentTime, 2, QL_first2, AR_first2, WT_first2, TG_first2, TH_first2, LT_first2, First2, Second2};
+        {currentTime, 2, QL_second2, AR_second2, WT_second2, TG_second2, TH_second2, LT_second2, Second2, First2}];
+
+<span class="keyword">end</span>
+
+disp(results);
+
+times = unique(results.Time);
+int1 = results.Intersection == 1;
+int2 = results.Intersection == 2;
+
+figure(<span class="string">'Name'</span>,<span class="string">'Intersection 1 - Total Green &amp; Left Turn'</span>,<span class="string">'NumberTitle'</span>,<span class="string">'off'</span>);
+subplot(2,1,1);
+plot(results.Time(int1), results.TotalGreen(int1), <span class="string">'-o'</span>, <span class="string">'LineWidth'</span>,1.2);
+xlabel(<span class="string">'Time'</span>);
+ylabel(<span class="string">'Total Green (sec)'</span>);
+title(<span class="string">'Intersection 1: Total Green Time'</span>);
+grid <span class="string">on</span>;
+
+subplot(2,1,2);
+plot(results.Time(int1), results.LeftTurn(int1), <span class="string">'--s'</span>, <span class="string">'LineWidth'</span>,1.2);
+xlabel(<span class="string">'Time'</span>);
+ylabel(<span class="string">'Left Turn (sec)'</span>);
+title(<span class="string">'Intersection 1: Left-Turn Green Time'</span>);
+grid <span class="string">on</span>;
+
+figure(<span class="string">'Name'</span>,<span class="string">'Intersection 2 - Total Green &amp; Left Turn'</span>,<span class="string">'NumberTitle'</span>,<span class="string">'off'</span>);
+subplot(2,1,1);
+plot(results.Time(int2), results.TotalGreen(int2), <span class="string">'-o'</span>, <span class="string">'LineWidth'</span>,1.2);
+xlabel(<span class="string">'Time'</span>); ylabel(<span class="string">'Total Green (sec)'</span>); title(<span class="string">'Intersection 2: Total Green Time'</span>);
+grid <span class="string">on</span>;
+
+subplot(2,1,2);
+plot(results.Time(int2), results.LeftTurn(int2), <span class="string">'--s'</span>, <span class="string">'LineWidth'</span>,1.2);
+xlabel(<span class="string">'Time'</span>); ylabel(<span class="string">'Left Turn (sec)'</span>); title(<span class="string">'Intersection 2: Left-Turn Green Time'</span>);
+grid <span class="string">on</span>;
+
+figure(<span class="string">'Name'</span>,<span class="string">'Queue Length over Time'</span>,<span class="string">'NumberTitle'</span>,<span class="string">'off'</span>);
+subplot(2,1,1);
+plot(results.Time(int1), results.Queue(int1), <span class="string">'-o'</span>, <span class="string">'LineWidth'</span>,1.2);
+xlabel(<span class="string">'Time'</span>); ylabel(<span class="string">'Queue Length (veh)'</span>); title(<span class="string">'Intersection 1: Queue Length'</span>);
+grid <span class="string">on</span>;
+
+subplot(2,1,2);
+plot(results.Time(int2), results.Queue(int2), <span class="string">'-o'</span>, <span class="string">'LineWidth'</span>,1.2);
+xlabel(<span class="string">'Time'</span>); ylabel(<span class="string">'Queue Length (veh)'</span>); title(<span class="string">'Intersection 2: Queue Length'</span>);
+grid <span class="string">on</span>;
+
+figure(<span class="string">'Name'</span>,<span class="string">'Arrival Rate over Time'</span>,<span class="string">'NumberTitle'</span>,<span class="string">'off'</span>);
+subplot(2,1,1);
+plot(results.Time(int1), results.Arrival(int1), <span class="string">'-o'</span>, <span class="string">'LineWidth'</span>,1.2);
+xlabel(<span class="string">'Time'</span>); ylabel(<span class="string">'Arrival Rate (veh/min)'</span>); title(<span class="string">'Intersection 1: Arrival Rate'</span>);
+grid <span class="string">on</span>;
+
+subplot(2,1,2);
+plot(results.Time(int2), results.Arrival(int2), <span class="string">'-o'</span>, <span class="string">'LineWidth'</span>,1.2);
+xlabel(<span class="string">'Time'</span>); ylabel(<span class="string">'Arrival Rate (veh/min)'</span>); title(<span class="string">'Intersection 2: Arrival Rate'</span>);
+grid <span class="string">on</span>;
+
+figure(<span class="string">'Name'</span>,<span class="string">'Waiting Time over Time'</span>,<span class="string">'NumberTitle'</span>,<span class="string">'off'</span>);
+subplot(2,1,1);
+plot(results.Time(int1), results.Waiting(int1), <span class="string">'-o'</span>, <span class="string">'LineWidth'</span>,1.2);
+xlabel(<span class="string">'Time'</span>); ylabel(<span class="string">'Waiting Time (sec)'</span>); title(<span class="string">'Intersection 1: Waiting Time'</span>);
+grid <span class="string">on</span>;
+
+subplot(2,1,2);
+plot(results.Time(int2), results.Waiting(int2), <span class="string">'-o'</span>, <span class="string">'LineWidth'</span>,1.2);
+xlabel(<span class="string">'Time'</span>); ylabel(<span class="string">'Waiting Time (sec)'</span>); title(<span class="string">'Intersection 2: Waiting Time'</span>);
+grid <span class="string">on</span>;
+</pre>
+<pre class="codeoutput">            Time            Intersection    Queue    Arrival    Waiting    TotalGreen    Through    LeftTurn    First    Second
+    ____________________    ____________    _____    _______    _______    __________    _______    ________    _____    ______
+
+    11-Dec-2025 00:00:00         1            1         1          1           23          23           5        NS        EW  
+    11-Dec-2025 00:00:00         1            1         2          2           23          23           5        EW        NS  
+    11-Dec-2025 00:00:00         2            0         1          0           23          23           5        NS        EW  
+    11-Dec-2025 00:00:00         2            0         2          0           23          23           5        EW        NS  
+    11-Dec-2025 00:30:00         1            0         3          1           23          23           5        NS        EW  
+    11-Dec-2025 00:30:00         1            0         5          2           24          24           5        EW        NS  
+    11-Dec-2025 00:30:00         2            0         3          0           23          23           5        NS        EW  
+    11-Dec-2025 00:30:00         2            0         5          0           24          24           5        EW        NS  
+    11-Dec-2025 01:00:00         1            3         3          2           23          23           5        EW        NS  
+    11-Dec-2025 01:00:00         1            2         6          1           24          24           5        NS        EW  
+    11-Dec-2025 01:00:00         2            0         6          0           24          24           5        NS        EW  
+    11-Dec-2025 01:00:00         2            0         3          0           23          23           5        EW        NS  
+    11-Dec-2025 01:30:00         1            2         4          1           24          24           5        EW        NS  
+    11-Dec-2025 01:30:00         1            0         1          1           23          23           5        NS        EW  
+    11-Dec-2025 01:30:00         2            0         1          0           23          23           5        NS        EW  
+    11-Dec-2025 01:30:00         2            0         4          0           24          24           5        EW        NS  
+    11-Dec-2025 02:00:00         1            1         5          1           24          24           5        EW        NS  
+    11-Dec-2025 02:00:00         1            0         5          0           24          24           5        NS        EW  
+    11-Dec-2025 02:00:00         2            0         5          0           24          24           5        NS        EW  
+    11-Dec-2025 02:00:00         2            0         5          0           24          24           5        EW        NS  
+    11-Dec-2025 02:30:00         1            2         2          2           23          23           5        EW        NS  
+    11-Dec-2025 02:30:00         1            0         3          1           23          23           5        NS        EW  
+    11-Dec-2025 02:30:00         2            0         3          0           23          23           5        NS        EW  
+    11-Dec-2025 02:30:00         2            0         2          0           23          23           5        EW        NS  
+    11-Dec-2025 03:00:00         1            3         0          1           23          23           5        NS        EW  
+    11-Dec-2025 03:00:00         1            2         4          2           24          24           5        EW        NS  
+    11-Dec-2025 03:00:00         2            0         0          0           23          23           5        NS        EW  
+    11-Dec-2025 03:00:00         2            0         4          0           24          24           5        EW        NS  
+    11-Dec-2025 03:30:00         1            0         7          1           24          24           5        NS        EW  
+    11-Dec-2025 03:30:00         1            0         1          1           23          23           5        EW        NS  
+    11-Dec-2025 03:30:00         2            0         7          0           24          24           5        NS        EW  
+    11-Dec-2025 03:30:00         2            0         1          0           23          23           5        EW        NS  
+    11-Dec-2025 04:00:00         1            1         2          2           23          23           5        EW        NS  
+    11-Dec-2025 04:00:00         1            0         0          0           23          23           5        NS        EW  
+    11-Dec-2025 04:00:00         2            0         0          0           23          23           5        NS        EW  
+    11-Dec-2025 04:00:00         2            0         2          0           23          23           5        EW        NS  
+    11-Dec-2025 04:30:00         1            3         2          2           23          23           5        NS        EW  
+    11-Dec-2025 04:30:00         1            2         1          2           23          23           5        EW        NS  
+    11-Dec-2025 04:30:00         2            0         2          0           23          23           5        NS        EW  
+    11-Dec-2025 04:30:00         2            0         1          0           23          23           5        EW        NS  
+    11-Dec-2025 05:00:00         1           60        16         33           93          93          19        NS        EW  
+    11-Dec-2025 05:00:00         1           25        15         20           55          55          11        EW        NS  
+    11-Dec-2025 05:00:00         2           13        16         16           46          46           9        NS        EW  
+    11-Dec-2025 05:00:00         2            0        15         11           24          24           5        EW        NS  
+    11-Dec-2025 05:30:00         1           48        18         50           87          87          17        NS        EW  
+    11-Dec-2025 05:30:00         1           30         9         57           55          55          11        EW        NS  
+    11-Dec-2025 05:30:00         2            2        18         34           55          55          11        NS        EW  
+    11-Dec-2025 05:30:00         2            0         9         47           50          50          10        EW        NS  
+    11-Dec-2025 06:00:00         1           55        14         47           93          93          19        EW        NS  
+    11-Dec-2025 06:00:00         1           35        23         57           55          55          11        NS        EW  
+    11-Dec-2025 06:00:00         2           10        14         34           55          55          11        EW        NS  
+    11-Dec-2025 06:00:00         2            8        23         39           55          55          11        NS        EW  
+    11-Dec-2025 06:30:00         1           34        13         29           55          55          11        EW        NS  
+    11-Dec-2025 06:30:00         1           30        14         17           55          55          11        NS        EW  
+    11-Dec-2025 06:30:00         2            8        13         20           43          43           9        EW        NS  
+    11-Dec-2025 06:30:00         2            2        14          3           24          24           5        NS        EW  
+    11-Dec-2025 07:00:00         1           60        40         72           92          92          18        NS        EW  
+    11-Dec-2025 07:00:00         1           60        40         44           95          95          19        EW        NS  
+    11-Dec-2025 07:00:00         2           14        40         56           85          85          17        NS        EW  
+    11-Dec-2025 07:00:00         2           13        40         23           77          77          15        EW        NS  
+    11-Dec-2025 07:30:00         1           32        38         75           93          93          19        NS        EW  
+    11-Dec-2025 07:30:00         1            7        40         89           93          93          19        EW        NS  
+    11-Dec-2025 07:30:00         2            0        38         57           55          55          11        NS        EW  
+    11-Dec-2025 07:30:00         2            0        40         71           85          85          17        EW        NS  
+    11-Dec-2025 08:00:00         1           60        40         70           92          92          18        NS        EW  
+    11-Dec-2025 08:00:00         1           60        40         81           94          94          19        EW        NS  
+    11-Dec-2025 08:00:00         2           15        40         52           92          92          18        NS        EW  
+    11-Dec-2025 08:00:00         2           13        40         64           77          77          15        EW        NS  
+    11-Dec-2025 08:30:00         1           60        40         34           93          93          19        NS        EW  
+    11-Dec-2025 08:30:00         1           60        40         77           93          93          19        EW        NS  
+    11-Dec-2025 08:30:00         2           13        40         58           77          77          15        EW        NS  
+    11-Dec-2025 08:30:00         2           11        40         14           55          55          11        NS        EW  
+    11-Dec-2025 09:00:00         1           54        12         39           93          93          19        NS        EW  
+    11-Dec-2025 09:00:00         1            9        14          5           24          24           5        EW        NS  
+    11-Dec-2025 09:00:00         2            7        12         19           40          40           8        NS        EW  
+    11-Dec-2025 09:00:00         2            0        14          2           24          24           5        EW        NS  
+    11-Dec-2025 09:30:00         1           34        18         23           55          55          11        NS        EW  
+    11-Dec-2025 09:30:00         1            3        10         53           55          55          11        EW        NS  
+    11-Dec-2025 09:30:00         2            8        18          9           24          24           5        NS        EW  
+    11-Dec-2025 09:30:00         2            0        10         41           55          55          11        EW        NS  
+    11-Dec-2025 10:00:00         1           38         7         61           59          59          12        EW        NS  
+    11-Dec-2025 10:00:00         1            6        18          5           24          24           5        NS        EW  
+    11-Dec-2025 10:00:00         2            7         7         54           38          38           8        EW        NS  
+    11-Dec-2025 10:00:00         2            0        18          0           23          23           5        NS        EW  
+    11-Dec-2025 10:30:00         1           38        15         27           55          55          11        EW        NS  
+    11-Dec-2025 10:30:00         1           31        11         64           66          66          13        NS        EW  
+    11-Dec-2025 10:30:00         2            8        15         14           24          24           5        EW        NS  
+    11-Dec-2025 10:30:00         2            0        11         51           55          55          11        NS        EW  
+    11-Dec-2025 11:00:00         1           54        22         40           94          94          19        EW        NS  
+    11-Dec-2025 11:00:00         1           25        17          5           55          55          11        NS        EW  
+    11-Dec-2025 11:00:00         2            8        22         29           55          55          11        EW        NS  
+    11-Dec-2025 11:00:00         2            0        17          0           23          23           5        NS        EW  
+    11-Dec-2025 11:30:00         1           22        16          6           55          55          11        NS        EW  
+    11-Dec-2025 11:30:00         1           17        20         40           55          55          11        EW        NS  
+    11-Dec-2025 11:30:00         2            0        16          0           23          23           5        NS        EW  
+    11-Dec-2025 11:30:00         2            0        20         32           55          55          11        EW        NS  
+    11-Dec-2025 12:00:00         1           43        11         56           67          67          13        EW        NS  
+    11-Dec-2025 12:00:00         1           13        13          3           46          46           9        NS        EW  
+    11-Dec-2025 12:00:00         2           11        11         46           55          55          11        EW        NS  
+    11-Dec-2025 12:00:00         2            0        13          0           24          24           5        NS        EW  
+    11-Dec-2025 12:30:00         1           54        12         62           92          92          18        NS        EW  
+    11-Dec-2025 12:30:00         1           40        11         43           55          55          11        EW        NS  
+    11-Dec-2025 12:30:00         2           14        11         35           55          55          11        EW        NS  
+    11-Dec-2025 12:30:00         2            8        12         41           55          55          11        NS        EW  
+    11-Dec-2025 13:00:00         1           11        16         11           32          32           6        EW        NS  
+    11-Dec-2025 13:00:00         1            7        13         58           55          55          11        NS        EW  
+    11-Dec-2025 13:00:00         2            0        13         54           55          55          11        NS        EW  
+    11-Dec-2025 13:00:00         2            0        16          1           23          23           5        EW        NS  
+    11-Dec-2025 13:30:00         1           51        15         72           92          92          18        EW        NS  
+    11-Dec-2025 13:30:00         1           22        21         20           55          55          11        NS        EW  
+    11-Dec-2025 13:30:00         2            4        15         60           55          55          11        EW        NS  
+    11-Dec-2025 13:30:00         2            0        21          0           23          23           5        NS        EW  
+    11-Dec-2025 14:00:00         1           21        11         14           55          55          11        EW        NS  
+    11-Dec-2025 14:00:00         1           14        14         77           85          85          17        NS        EW  
+    11-Dec-2025 14:00:00         2            0        14         67           55          55          11        NS        EW  
+    11-Dec-2025 14:00:00         2            0        11          0           24          24           5        EW        NS  
+    11-Dec-2025 14:30:00         1           51        18         49           93          93          19        NS        EW  
+    11-Dec-2025 14:30:00         1           25        19         48           55          55          11        EW        NS  
+    11-Dec-2025 14:30:00         2            3        18         29           55          55          11        NS        EW  
+    11-Dec-2025 14:30:00         2            0        19         36           55          55          11        EW        NS  
+    11-Dec-2025 15:00:00         1           38        11         90           92          92          18        EW        NS  
+    11-Dec-2025 15:00:00         1           21        15         60           55          55          11        NS        EW  
+    11-Dec-2025 15:00:00         2            0        15         45           55          55          11        NS        EW  
+    11-Dec-2025 15:00:00         2            0        11         76           55          55          11        EW        NS  
+    11-Dec-2025 15:30:00         1           54        10          3           55          55          11        EW        NS  
+    11-Dec-2025 15:30:00         1            7        10         59           55          55          11        NS        EW  
+    11-Dec-2025 15:30:00         2           27        10          0           55          55          11        EW        NS  
+    11-Dec-2025 15:30:00         2            0        10         51           55          55          11        NS        EW  
+    11-Dec-2025 16:00:00         1           46        11         25           80          80          16        NS        EW  
+    11-Dec-2025 16:00:00         1           33        19         22           55          55          11        EW        NS  
+    11-Dec-2025 16:00:00         2            5        11          8           24          24           5        NS        EW  
+    11-Dec-2025 16:00:00         2            5        19         13           24          24           5        EW        NS  
+    11-Dec-2025 16:30:00         1           21        18         56           55          55          11        NS        EW  
+    11-Dec-2025 16:30:00         1            7        20         32           55          55          11        EW        NS  
+    11-Dec-2025 16:30:00         2            0        18         42           55          55          11        NS        EW  
+    11-Dec-2025 16:30:00         2            0        20         23           51          51          10        EW        NS  
+    11-Dec-2025 17:00:00         1           60        40         78           93          93          19        EW        NS  
+    11-Dec-2025 17:00:00         1           59        40         74           93          93          19        NS        EW  
+    11-Dec-2025 17:00:00         2           12        40         52           69          69          14        NS        EW  
+    11-Dec-2025 17:00:00         2           12        40         56           69          69          14        EW        NS  
+    11-Dec-2025 17:30:00         1           55        39         47           94          94          19        EW        NS  
+    11-Dec-2025 17:30:00         1           48        40         76           92          92          18        NS        EW  
+    11-Dec-2025 17:30:00         2            7        39         30           55          55          11        EW        NS  
+    11-Dec-2025 17:30:00         2            2        40         60           55          55          11        NS        EW  
+    11-Dec-2025 18:00:00         1           60        40         28           92          92          18        EW        NS  
+    11-Dec-2025 18:00:00         1           25        40         54           94          94          19        NS        EW  
+    11-Dec-2025 18:00:00         2           16        40          7           55          55          11        EW        NS  
+    11-Dec-2025 18:00:00         2            0        40         36           55          55          11        NS        EW  
+    11-Dec-2025 18:30:00         1           60        40         58           93          93          19        NS        EW  
+    11-Dec-2025 18:30:00         1           39        40         89           93          93          19        EW        NS  
+    11-Dec-2025 18:30:00         2           13        40         37           77          77          15        NS        EW  
+    11-Dec-2025 18:30:00         2            0        40         67           75          75          15        EW        NS  
+    11-Dec-2025 19:00:00         1           60        40         80           93          93          19        EW        NS  
+    11-Dec-2025 19:00:00         1            7        40         27           55          55          11        NS        EW  
+    11-Dec-2025 19:00:00         2           15        40         68           92          92          18        EW        NS  
+    11-Dec-2025 19:00:00         2            0        40          9           55          55          11        NS        EW  
+    11-Dec-2025 19:30:00         1           60        40         80           93          93          19        EW        NS  
+    11-Dec-2025 19:30:00         1           30        40         64           92          92          18        NS        EW  
+    11-Dec-2025 19:30:00         2           11        40         64           69          69          14        EW        NS  
+    11-Dec-2025 19:30:00         2            0        40         45           55          55          11        NS        EW  
+    11-Dec-2025 20:00:00         1           56        40         45           94          94          19        EW        NS  
+    11-Dec-2025 20:00:00         1           39        40         31           93          93          19        NS        EW  
+    11-Dec-2025 20:00:00         2            7        40         24           55          55          11        EW        NS  
+    11-Dec-2025 20:00:00         2            0        40         14           55          55          11        NS        EW  
+    11-Dec-2025 20:30:00         1           60        40         27           92          92          18        NS        EW  
+    11-Dec-2025 20:30:00         1           27        40         78           93          93          19        EW        NS  
+    11-Dec-2025 20:30:00         2           12        40          7           55          55          11        NS        EW  
+    11-Dec-2025 20:30:00         2            0        40         57           55          55          11        EW        NS  
+    11-Dec-2025 21:00:00         1           13        21         81           77          77          15        NS        EW  
+    11-Dec-2025 21:00:00         1            0        18         41           55          55          11        EW        NS  
+    11-Dec-2025 21:00:00         2            0        21         65           55          55          11        NS        EW  
+    11-Dec-2025 21:00:00         2            0        18         29           55          55          11        EW        NS  
+    11-Dec-2025 21:30:00         1           46        15         61           80          80          16        EW        NS  
+    11-Dec-2025 21:30:00         1            3        26         36           55          55          11        NS        EW  
+    11-Dec-2025 21:30:00         2            4        15         51           55          55          11        EW        NS  
+    11-Dec-2025 21:30:00         2            0        26         18           36          36           7        NS        EW  
+    11-Dec-2025 22:00:00         1            1         5          1           24          24           5        NS        EW  
+    11-Dec-2025 22:00:00         1            0         2          2           23          23           5        EW        NS  
+    11-Dec-2025 22:00:00         2            0         5          0           24          24           5        NS        EW  
+    11-Dec-2025 22:00:00         2            0         2          0           23          23           5        EW        NS  
+    11-Dec-2025 22:30:00         1            4         5          1           24          24           5        NS        EW  
+    11-Dec-2025 22:30:00         1            2         4          1           24          24           5        EW        NS  
+    11-Dec-2025 22:30:00         2            0         5          0           24          24           5        NS        EW  
+    11-Dec-2025 22:30:00         2            0         4          0           24          24           5        EW        NS  
+    11-Dec-2025 23:00:00         1            2         0          0           23          23           5        NS        EW  
+    11-Dec-2025 23:00:00         1            0         2          0           23          23           5        EW        NS  
+    11-Dec-2025 23:00:00         2            0         0          0           23          23           5        NS        EW  
+    11-Dec-2025 23:00:00         2            0         2          0           23          23           5        EW        NS  
+    11-Dec-2025 23:30:00         1            0         2          1           23          23           5        NS        EW  
+    11-Dec-2025 23:30:00         1            0         6          2           24          24           5        EW        NS  
+    11-Dec-2025 23:30:00         2            0         2          0           23          23           5        NS        EW  
+    11-Dec-2025 23:30:00         2            0         6          0           24          24           5        EW        NS  
+    12-Dec-2025 00:00:00         1            0         8          0           25          25           5        NS        EW  
+    12-Dec-2025 00:00:00         1            0         5          0           24          24           5        EW        NS  
+    12-Dec-2025 00:00:00         2            0         8          0           25          25           5        NS        EW  
+    12-Dec-2025 00:00:00         2            0         5          0           24          24           5        EW        NS  
+
+</pre>
+<img vspace="5" hspace="5" src="./OneDaySimulation_01.png" alt=""> <img vspace="5" hspace="5" src="./OneDaySimulation_02.png" alt=""> <img vspace="5" hspace="5" src="./OneDaySimulation_03.png" alt=""> <img vspace="5" hspace="5" src="./OneDaySimulation_04.png" alt=""> <img vspace="5" hspace="5" src="./OneDaySimulation_05.png" alt=""> <p class="footer">
+<br>
+<a href="https://www.mathworks.com/products/matlab/">Published with MATLAB® R2025b</a>
+<br>
+</p>
+</div>
+<!--
+##### SOURCE BEGIN #####
+clc; clear; close all;
+
+startTime = datetime(2025,12,11,0,0,0);
+endTime   = datetime(2025,12,12,0,0,0);
+timeSteps = startTime:minutes(30):endTime;
+iterations = numel(timeSteps);
+
+fis = mamfis('Name', 'Special Problem');
+
+fis = addInput(fis, [0 60], 'Name', 'Queue');
+fis = addMF(fis, 'Queue', 'trimf', [0 0 15], 'Name', 'Short');
+fis = addMF(fis, 'Queue', 'trimf', [10 30 50], 'Name', 'Medium');
+fis = addMF(fis, 'Queue', 'trimf', [40 60 60], 'Name', 'Long');
+
+fis = addInput(fis, [0 40], 'Name', 'Arrival');
+fis = addMF(fis, 'Arrival', 'trimf', [0 0 10], 'Name', 'Low');
+fis = addMF(fis, 'Arrival', 'trimf', [5 20 35], 'Name', 'Medium');
+fis = addMF(fis, 'Arrival', 'trimf', [30 40 40], 'Name', 'High');
+
+fis = addInput(fis, [0 90], 'Name', 'Waiting');
+fis = addMF(fis, 'Waiting', 'trimf', [0 0 25], 'Name', 'Short');
+fis = addMF(fis, 'Waiting', 'trimf', [15 45 75], 'Name', 'Moderate');
+fis = addMF(fis, 'Waiting', 'trimf', [60 90 90], 'Name', 'Long');
+
+fis = addOutput(fis, [0 120], 'Name', 'TotalGreen');
+fis = addMF(fis, 'TotalGreen', 'trapmf', [10 10 30 40], 'Name', 'Short');
+fis = addMF(fis, 'TotalGreen', 'trapmf', [30 40 70 80], 'Name', 'Medium');
+fis = addMF(fis, 'TotalGreen', 'trapmf', [60 80 120 120], 'Name', 'Long');
+
+fis.DefuzzificationMethod = 'centroid';
+
+fuzzyrules = [
+    1 1 1 1; 1 1 2 1; 1 1 3 2;
+    1 2 1 1; 1 2 2 2; 1 2 3 2;
+    1 3 1 2; 1 3 2 2; 1 3 3 3;
+    2 1 1 2; 2 1 2 2; 2 1 3 3;
+    2 2 1 2; 2 2 2 2; 2 2 3 3;
+    2 3 1 2; 2 3 2 3; 2 3 3 3;
+    3 1 1 2; 3 1 2 2; 3 1 3 3;
+    3 2 1 2; 3 2 2 3; 3 2 3 3;
+    3 3 1 3; 3 3 2 3; 3 3 3 3
+];
+
+for i = 1:size(fuzzyrules, 1)
+    fis = addRule(fis, [fuzzyrules(i,:) 1 1]);
+end
+
+leftshare = 0.2;
+queue_range = [0 60];     
+waiting_range = [0 90];   
+results = table('Size',[0 10],...
+    'VariableTypes',{'datetime','double','double','double','double','double','double','double','categorical','categorical'},...
+    'VariableNames',{'Time','Intersection','Queue','Arrival','Waiting','TotalGreen','Through','LeftTurn','First','Second'});
+
+% rng('shuffle'); 
+
+for t = 1:iterations
+    currentTime = timeSteps(t);
+    tdec = hour(currentTime) + minute(currentTime)/60;
+
+    if (hour(currentTime) >= 0 && hour(currentTime) < 5) || (hour(currentTime) >= 22 && hour(currentTime) <= 23)
+        lambda = 3;                      
+        QL_NS1 = poissrnd(1);            
+        QL_EW1 = poissrnd(1);
+        WT_NS1 = round(rand*2);                 
+        WT_EW1 = round(rand*2);
+
+    elseif (tdec >= 7 && tdec < 9) || (tdec >= 17 && tdec < 21)
+        lambda = 50;                     
+        QL_NS1 = max(0, round(normrnd(60,20))); 
+        QL_EW1 = max(0, round(normrnd(60,20)));
+        WT_NS1 = randi([25 90]);         
+        WT_EW1 = randi([25 90]);
+    else
+        lambda = 15;                    
+        QL_NS1 = randi(queue_range);
+        QL_EW1 = randi(queue_range);
+        WT_NS1 = randi(waiting_range);
+        WT_EW1 = randi(waiting_range);
+    end
+
+   AR_NS1 = poissrnd(lambda);
+   AR_EW1 = poissrnd(lambda);
+
+   AR_NS1 = max(min(AR_NS1,40),0);
+   AR_EW1 = max(min(AR_EW1,40),0);
+   QL_NS1 = max(min(QL_NS1,60),0);
+   QL_EW1 = max(min(QL_EW1,60),0);
+   WT_NS1 = max(min(WT_NS1,90),0);
+   WT_EW1 = max(min(WT_EW1,90),0);
+
+    if QL_NS1 >= QL_EW1
+        First = 'NS'; 
+        Second = 'EW';
+        QL_first = QL_NS1; 
+        AR_first = AR_NS1; 
+        WT_first = WT_NS1;
+        QL_second = QL_EW1; 
+        AR_second = AR_EW1; 
+        WT_second = WT_EW1;
+    else
+        First = 'EW'; 
+        Second = 'NS';
+        QL_first = QL_EW1; 
+        AR_first = AR_EW1; 
+        WT_first = WT_EW1;
+        QL_second = QL_NS1; 
+        AR_second = AR_NS1; 
+        WT_second = WT_NS1;
+    end
+
+    TG_first = round(evalfis(fis, [QL_first, AR_first, WT_first]));
+    TG_second = round(evalfis(fis, [QL_second, AR_second, WT_second]));
+    LT_first = max(round(TG_first * leftshare), 3);
+    LT_second = max(round(TG_second * leftshare), 3);
+    TH_first = TG_first;
+    TH_second = TG_second;
+
+    results = [results;
+        {currentTime, 1, QL_first, AR_first, WT_first, TG_first, TH_first, LT_first, First, Second};
+        {currentTime, 1, QL_second, AR_second, WT_second, TG_second, TH_second, LT_second, Second, First}];
+
+    served_factor = 0.5; 
+    QL_NS2 = max(0, QL_NS1 - round(served_factor * TG_first*(strcmp(First,'NS') + 0*strcmp(Second,'NS'))) ...
+                    - round(served_factor * TG_second*(strcmp(Second,'NS') + 0*strcmp(First,'NS'))) + randi([-2 2]));
+    QL_EW2 = max(0, QL_EW1 - round(served_factor * TG_first*(strcmp(First,'EW') + 0*strcmp(Second,'EW'))) ...
+                    - round(served_factor * TG_second*(strcmp(Second,'EW') + 0*strcmp(First,'EW'))) + randi([-2 2]));
+
+    AR_NS2 = AR_NS1;
+    AR_EW2 = AR_EW1;
+    WT_NS2 = max(0, WT_NS1 - round(0.2*TG_first) + randi([-3 3]));
+    WT_EW2 = max(0, WT_EW1 - round(0.2*TG_second) + randi([-3 3]));
+
+    QL_NS2 = max(min(QL_NS2,160),0);
+    QL_EW2 = max(min(QL_EW2,160),0);
+    WT_NS2 = max(min(WT_NS2,90),0);
+    WT_EW2 = max(min(WT_EW2,90),0);
+
+    if QL_NS2 >= QL_EW2
+        First2 = 'NS'; 
+        Second2 = 'EW';
+        QL_first2 = QL_NS2; 
+        AR_first2 = AR_NS2; 
+        WT_first2 = WT_NS2;
+        QL_second2 = QL_EW2; 
+        AR_second2 = AR_EW2; 
+        WT_second2 = WT_EW2;
+    else
+        First2 = 'EW'; 
+        Second2 = 'NS';
+        QL_first2 = QL_EW2; 
+        AR_first2 = AR_EW2; 
+        WT_first2 = WT_EW2;
+        QL_second2 = QL_NS2; 
+        AR_second2 = AR_NS2; 
+        WT_second2 = WT_NS2;
+    end
+
+    TG_first2 = round(evalfis(fis, [QL_first2, AR_first2, WT_first2]));
+    TG_second2 = round(evalfis(fis, [QL_second2, AR_second2, WT_second2]));
+    LT_first2 = max(round(TG_first2 * leftshare), 3);
+    LT_second2 = max(round(TG_second2 * leftshare), 3);
+    TH_first2 = TG_first2;
+    TH_second2 = TG_second2;
+
+    results = [results;
+        {currentTime, 2, QL_first2, AR_first2, WT_first2, TG_first2, TH_first2, LT_first2, First2, Second2};
+        {currentTime, 2, QL_second2, AR_second2, WT_second2, TG_second2, TH_second2, LT_second2, Second2, First2}];
+
+end
+
+disp(results);
+
+times = unique(results.Time);
+int1 = results.Intersection == 1;
+int2 = results.Intersection == 2;
+
+figure('Name','Intersection 1 - Total Green & Left Turn','NumberTitle','off');
+subplot(2,1,1);
+plot(results.Time(int1), results.TotalGreen(int1), '-o', 'LineWidth',1.2);
+xlabel('Time'); 
+ylabel('Total Green (sec)'); 
+title('Intersection 1: Total Green Time');
+grid on;
+
+subplot(2,1,2);
+plot(results.Time(int1), results.LeftTurn(int1), 'REPLACE_WITH_DASH_DASHs', 'LineWidth',1.2);
+xlabel('Time'); 
+ylabel('Left Turn (sec)'); 
+title('Intersection 1: Left-Turn Green Time');
+grid on;
+
+figure('Name','Intersection 2 - Total Green & Left Turn','NumberTitle','off');
+subplot(2,1,1);
+plot(results.Time(int2), results.TotalGreen(int2), '-o', 'LineWidth',1.2);
+xlabel('Time'); ylabel('Total Green (sec)'); title('Intersection 2: Total Green Time');
+grid on;
+
+subplot(2,1,2);
+plot(results.Time(int2), results.LeftTurn(int2), 'REPLACE_WITH_DASH_DASHs', 'LineWidth',1.2);
+xlabel('Time'); ylabel('Left Turn (sec)'); title('Intersection 2: Left-Turn Green Time');
+grid on;
+
+figure('Name','Queue Length over Time','NumberTitle','off');
+subplot(2,1,1);
+plot(results.Time(int1), results.Queue(int1), '-o', 'LineWidth',1.2);
+xlabel('Time'); ylabel('Queue Length (veh)'); title('Intersection 1: Queue Length');
+grid on;
+
+subplot(2,1,2);
+plot(results.Time(int2), results.Queue(int2), '-o', 'LineWidth',1.2);
+xlabel('Time'); ylabel('Queue Length (veh)'); title('Intersection 2: Queue Length');
+grid on;
+
+figure('Name','Arrival Rate over Time','NumberTitle','off');
+subplot(2,1,1);
+plot(results.Time(int1), results.Arrival(int1), '-o', 'LineWidth',1.2);
+xlabel('Time'); ylabel('Arrival Rate (veh/min)'); title('Intersection 1: Arrival Rate');
+grid on;
+
+subplot(2,1,2);
+plot(results.Time(int2), results.Arrival(int2), '-o', 'LineWidth',1.2);
+xlabel('Time'); ylabel('Arrival Rate (veh/min)'); title('Intersection 2: Arrival Rate');
+grid on;
+
+figure('Name','Waiting Time over Time','NumberTitle','off');
+subplot(2,1,1);
+plot(results.Time(int1), results.Waiting(int1), '-o', 'LineWidth',1.2);
+xlabel('Time'); ylabel('Waiting Time (sec)'); title('Intersection 1: Waiting Time');
+grid on;
+
+subplot(2,1,2);
+plot(results.Time(int2), results.Waiting(int2), '-o', 'LineWidth',1.2);
+xlabel('Time'); ylabel('Waiting Time (sec)'); title('Intersection 2: Waiting Time');
+grid on;
+##### SOURCE END #####
+-->
+
+
+</body></html>
